@@ -1,0 +1,150 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "footer": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "left": { "type": "string" },
+        "right": { "type": "string" },
+        "center": { "type": "string" },
+        "fontSize": { "type": "string" },
+        "color": { "type": "string" },
+        "padding": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "header": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "left": { "type": "string" },
+        "center": { "type": "string" },
+        "right": { "type": "string" },
+        "fontSize": { "type": "string" },
+        "color": { "type": "string" },
+        "padding": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "page": {
+      "type": "object",
+      "properties": {
+        "format": {
+          "type": "string",
+          "enum": ["A4", "Letter", "Legal", "A3", "A5", "Tabloid"]
+        },
+        "margin": {
+          "type": "object",
+          "properties": {
+            "top": { "type": "string" },
+            "right": { "type": "string" },
+            "bottom": { "type": "string" },
+            "left": { "type": "string" }
+          },
+          "additionalProperties": false
+        },
+        "printBackground": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "style": {
+      "type": "object",
+      "properties": {
+        "fontFamily": { "type": "string" },
+        "fontSize": { "type": "string" },
+        "lineHeight": { "type": ["string", "number"] },
+        "color": { "type": "string" },
+        "backgroundColor": { "type": "string" },
+        "customCSS": { "type": "string" },
+        "h1": { "$ref": "#/definitions/headingStyle" },
+        "h2": { "$ref": "#/definitions/headingStyle" },
+        "h3": { "$ref": "#/definitions/headingStyle" },
+        "h4": { "$ref": "#/definitions/headingStyle" },
+        "h5": { "$ref": "#/definitions/headingStyle" },
+        "h6": { "$ref": "#/definitions/headingStyle" },
+        "code": {
+          "type": "object",
+          "properties": {
+            "backgroundColor": { "type": "string" },
+            "color": { "type": "string" },
+            "fontSize": { "type": "string" }
+          }
+        },
+        "codeBlock": {
+          "type": "object",
+          "properties": {
+            "backgroundColor": { "type": "string" },
+            "border": { "type": "string" },
+            "fontSize": { "type": "string" }
+          }
+        },
+        "table": {
+          "type": "object",
+          "properties": {
+            "headerBackground": { "type": "string" },
+            "headerColor": { "type": "string" },
+            "borderColor": { "type": "string" }
+          }
+        },
+        "blockquote": {
+          "type": "object",
+          "properties": {
+            "borderLeft": { "type": "string" },
+            "backgroundColor": { "type": "string" },
+            "color": { "type": "string" }
+          }
+        },
+        "link": {
+          "type": "object",
+          "properties": {
+            "color": { "type": "string" }
+          }
+        }
+      }
+    },
+    "variables": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "output": {
+      "type": "object",
+      "properties": {
+        "displayHeaderFooter": { "type": "boolean" },
+        "preferCSSPageSize": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "toc": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "position": { "type": "string", "enum": ["start", "end"] },
+        "depth": { "type": "integer", "minimum": 1, "maximum": 6 },
+        "title": { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "theme": { "type": "string" },
+    "themes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object"
+      }
+    }
+  },
+  "definitions": {
+    "headingStyle": {
+      "type": "object",
+      "properties": {
+        "color": { "type": "string" },
+        "borderBottom": { "type": "string" },
+        "fontSize": { "type": "string" },
+        "fontWeight": { "type": ["string", "number"] },
+        "marginTop": { "type": "string" },
+        "marginBottom": { "type": "string" }
+      }
+    }
+  }
+}

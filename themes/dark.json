@@ -1,0 +1,46 @@
+{
+  "style": {
+    "fontFamily": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif",
+    "fontSize": "16px",
+    "lineHeight": "1.6",
+    "color": "#e0e0e0",
+    "backgroundColor": "#1e1e1e",
+    "h1": {
+      "color": "#61dafb",
+      "borderBottom": "3px solid #61dafb",
+      "fontSize": "32px"
+    },
+    "h2": {
+      "color": "#98c379",
+      "borderBottom": "2px solid #3e4451",
+      "fontSize": "24px"
+    },
+    "h3": {
+      "color": "#e5c07b",
+      "fontSize": "20px"
+    },
+    "code": {
+      "backgroundColor": "#2d2d2d",
+      "color": "#e06c75",
+      "fontSize": "13px"
+    },
+    "codeBlock": {
+      "backgroundColor": "#282c34",
+      "border": "1px solid #3e4451",
+      "fontSize": "13px"
+    },
+    "table": {
+      "headerBackground": "#3e4451",
+      "headerColor": "#e0e0e0",
+      "borderColor": "#3e4451"
+    },
+    "blockquote": {
+      "borderLeft": "4px solid #61dafb",
+      "backgroundColor": "#282c34",
+      "color": "#abb2bf"
+    },
+    "link": {
+      "color": "#61dafb"
+    }
+  }
+}

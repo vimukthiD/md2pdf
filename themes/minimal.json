@@ -1,0 +1,27 @@
+{
+  "style": {
+    "fontFamily": "Georgia, 'Times New Roman', serif",
+    "fontSize": "15px",
+    "lineHeight": "1.8",
+    "color": "#444444",
+    "h1": {
+      "color": "#333333",
+      "borderBottom": "1px solid #cccccc",
+      "fontSize": "28px"
+    },
+    "h2": {
+      "color": "#444444",
+      "borderBottom": "none",
+      "fontSize": "22px"
+    },
+    "code": {
+      "backgroundColor": "#f9f9f9",
+      "color": "#333333"
+    },
+    "table": {
+      "headerBackground": "#f5f5f5",
+      "headerColor": "#333333",
+      "borderColor": "#dddddd"
+    }
+  }
+}
