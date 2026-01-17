@@ -12,7 +12,7 @@ function createMarkdownParser() {
       if (lang && hljs.getLanguage(lang)) {
         try {
           return `<pre class="md2pdf-code-block hljs"><code class="language-${lang}">${hljs.highlight(str, { language: lang, ignoreIllegals: true }).value}</code></pre>`;
-        } catch (_) {
+        } catch {
           // Ignore highlighting errors
         }
       }
