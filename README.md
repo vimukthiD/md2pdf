@@ -288,7 +288,7 @@ Contributions are welcome! Please read our contributing guidelines before submit
 
 ## Changelog
 
-### 1.0.0
+### 2.0.1
 - Added configuration file support
 - Added theme support
 - Added custom CSS support

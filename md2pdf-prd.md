@@ -1,7 +1,7 @@
 # Product Requirements Document (PRD)
 # md2pdf - Configurable Markdown to PDF Converter
 
-**Version**: 1.0.0  
+**Version**: 2.0.1  
 **Author**: Vimukthi Dissanayake  
 **Date**: 2025-01-16  
 **Status**: Draft
@@ -816,7 +816,7 @@ md2pdf document.md --watch
 
 ## 7. Release Plan
 
-### 7.1 Phase 1: Core Features (v1.0.0)
+### 7.1 Phase 1: Core Features (v2.0.1)
 **Timeline**: 2 weeks
 
 **Features**:

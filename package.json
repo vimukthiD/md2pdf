@@ -1,6 +1,6 @@
 {
   "name": "@vimukthid/md2pdf",
-  "version": "1.0.0",
+  "version": "2.0.1",
   "description": "A configurable command-line utility that converts Markdown files to professionally formatted PDFs with customizable styling, headers, footers, and themes",
   "main": "src/index.js",
   "bin": {
@@ -30,12 +30,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vimukthid/md2pdf.git"
+    "url": "git+https://github.com/vimukthiD/md2pdf.git"
   },
   "bugs": {
-    "url": "https://github.com/vimukthid/md2pdf/issues"
+    "url": "https://github.com/vimukthiD/md2pdf/issues"
   },
-  "homepage": "https://github.com/vimukthid/md2pdf#readme",
+  "homepage": "https://github.com/vimukthiD/md2pdf#readme",
   "engines": {
     "node": ">=16.0.0"
   },
