@@ -14,6 +14,7 @@ const { getDefaults, generateDefaultConfig } = require('../src/config/defaults')
 const { convertMarkdownToPdf } = require('../src/converter/pdf-generator');
 const { validateInput } = require('../src/utils/validation');
 const { logger } = require('../src/utils/logger');
+const { mergeMarkdownFiles, getCommonBasePath } = require('../src/utils/markdown-merger');
 
 const packageJson = require('../package.json');
 
@@ -21,8 +22,7 @@ program
   .name('md2pdf')
   .description('Convert Markdown files to professionally formatted PDFs')
   .version(packageJson.version, '-v, --version', 'Show version number')
-  .argument('[input]', 'Path to input Markdown file')
-  .argument('[output]', 'Path to output PDF file (optional)')
+  .argument('[inputs...]', 'Path to input Markdown file(s) - can specify multiple files')
   .option('-c, --config <path>', 'Path to configuration file')
   .option('-o, --output <path>', 'Output PDF path')
   .option('--init', 'Generate default config file (md2pdf.config.json)')
@@ -32,7 +32,8 @@ program
   .option('--css <path>', 'Path to custom CSS file')
   .option('--verbose', 'Show detailed conversion process')
   .option('--quiet', 'Suppress all output except errors')
-  .action(async (input, output, options) => {
+  .option('--no-page-breaks', 'Disable automatic page breaks between merged files')
+  .action(async (inputs, options) => {
     try {
       if (options.verbose) {
         logger.setLevel('verbose');
@@ -50,12 +51,12 @@ program
         return;
       }
 
-      if (!input) {
+      if (!inputs || inputs.length === 0) {
         program.help();
         return;
       }
 
-      await handleConvert(input, output, options);
+      await handleConvert(inputs, options);
     } catch (error) {
       logger.error(error.message);
       process.exit(1);
@@ -112,18 +113,28 @@ async function handleValidate(options) {
   }
 }
 
-async function handleConvert(input, output, options) {
+async function handleConvert(inputs, options) {
+  const isMultiFile = inputs.length > 1;
+
+  if (isMultiFile) {
+    await handleMultiFileConvert(inputs, options);
+  } else {
+    await handleSingleFileConvert(inputs[0], options);
+  }
+}
+
+async function handleSingleFileConvert(input, options) {
   const inputPath = path.resolve(input);
-  
+
   const validation = validateInput(inputPath);
   if (!validation.valid) {
     throw new Error(validation.error);
   }
 
-  const outputPath = output || options.output || inputPath.replace(/\.md$/i, '.pdf');
-  
+  const outputPath = options.output || inputPath.replace(/\.md$/i, '.pdf');
+
   let config = getDefaults();
-  
+
   if (options.config !== false) {
     const loadedConfig = await loadConfig(options.config);
     config = mergeConfigs(config, loadedConfig);
@@ -150,10 +161,75 @@ async function handleConvert(input, output, options) {
   }
 
   const spinner = ora('Converting Markdown to PDF...').start();
-  
+
   try {
     await convertMarkdownToPdf(inputPath, outputPath, config);
     spinner.succeed(chalk.green(`PDF created: ${outputPath}`));
+  } catch (error) {
+    spinner.fail(chalk.red('Conversion failed'));
+    throw error;
+  }
+}
+
+async function handleMultiFileConvert(inputs, options) {
+  const inputPaths = inputs.map(input => path.resolve(input));
+
+  for (const inputPath of inputPaths) {
+    const validation = validateInput(inputPath);
+    if (!validation.valid) {
+      throw new Error(`${inputPath}: ${validation.error}`);
+    }
+  }
+
+  if (!options.output) {
+    throw new Error('Output path (-o, --output) is required when converting multiple files');
+  }
+
+  const outputPath = path.resolve(options.output);
+
+  let config = getDefaults();
+
+  if (options.config !== false) {
+    const loadedConfig = await loadConfig(options.config);
+    config = mergeConfigs(config, loadedConfig);
+  }
+
+  if (options.theme) {
+    const themeConfig = loadTheme(options.theme);
+    config = mergeConfigs(config, themeConfig);
+  }
+
+  if (options.css) {
+    const cssPath = path.resolve(options.css);
+    if (fs.existsSync(cssPath)) {
+      config.style = config.style || {};
+      config.style.customCSS = fs.readFileSync(cssPath, 'utf-8');
+    } else {
+      throw new Error(`CSS file not found: ${options.css}`);
+    }
+  }
+
+  const validationResult = validateConfig(config);
+  if (!validationResult.valid) {
+    throw new Error(`Invalid configuration: ${validationResult.errors.join(', ')}`);
+  }
+
+  const spinner = ora(`Converting ${inputPaths.length} Markdown files to PDF...`).start();
+
+  try {
+    const mergeOptions = {
+      addPageBreaks: options.pageBreaks !== false
+    };
+
+    const mergedContent = mergeMarkdownFiles(inputPaths, mergeOptions);
+    const basePath = getCommonBasePath(inputPaths);
+
+    await convertMarkdownToPdf(mergedContent, outputPath, config, {
+      isContent: true,
+      basePath: basePath
+    });
+
+    spinner.succeed(chalk.green(`PDF created from ${inputPaths.length} files: ${outputPath}`));
   } catch (error) {
     spinner.fail(chalk.red('Conversion failed'));
     throw error;

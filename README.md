@@ -8,6 +8,7 @@ A configurable command-line utility that converts Markdown files to professional
 ## Features
 
 - Convert Markdown to professionally styled PDFs
+- Merge multiple Markdown files into a single PDF (with automatic page breaks)
 - Configurable headers and footers with variable substitution
 - Multiple built-in themes (default, minimal, dark, professional)
 - Custom CSS support
@@ -31,11 +32,14 @@ npm install @vimukthid/md2pdf
 ## Quick Start
 
 ```bash
-# Convert a Markdown file to PDF
+# Convert a Markdown file to PDF (output: document.pdf)
 md2pdf document.md
 
 # Specify output file
-md2pdf document.md output.pdf
+md2pdf document.md -o output.pdf
+
+# Merge multiple Markdown files into one PDF
+md2pdf chapter1.md chapter2.md chapter3.md -o book.pdf
 
 # Use a specific theme
 md2pdf document.md --theme dark
@@ -47,24 +51,49 @@ md2pdf --init
 ## Usage
 
 ```bash
-md2pdf <input.md> [output.pdf] [options]
+md2pdf <inputs...> [options]
 
 Arguments:
-  input.md              Path to input Markdown file (required)
-  output.pdf            Path to output PDF file (optional)
+  inputs                Path to input Markdown file(s). Specify multiple files
+                        to merge them into a single PDF in the given order.
 
 Options:
   -c, --config <path>   Path to configuration file
-  -o, --output <path>   Output PDF path
+  -o, --output <path>   Output PDF path (required when passing multiple inputs)
   --init                Generate default config file (md2pdf.config.json)
   --validate            Validate configuration file without converting
   --no-config           Ignore all configuration files, use defaults only
   --theme <name>        Use a built-in theme (default, minimal, dark, professional)
   --css <path>          Path to custom CSS file
+  --no-page-breaks      Disable automatic page breaks between merged files
   --verbose             Show detailed conversion process
   --quiet               Suppress all output except errors
   -v, --version         Show version number
   -h, --help            Show help message
+```
+
+> **Note:** The legacy positional-output form `md2pdf input.md output.pdf` was
+> removed in v2.1.0. With multi-file support, a second positional argument is
+> interpreted as another input file. Use `-o`/`--output` to specify the output path.
+
+## Multi-File Conversion
+
+Pass multiple Markdown files to merge them into a single PDF. Files are concatenated
+in the order specified, with an automatic page break between each.
+
+```bash
+md2pdf chapter1.md chapter2.md chapter3.md -o book.pdf
+```
+
+- `-o`/`--output` is **required** when passing more than one input file.
+- Pass `--no-page-breaks` to concatenate without forcing a new page between files.
+- Relative paths inside the merged Markdown (e.g. images) are resolved from the
+  common parent directory of the inputs.
+- Themes, custom CSS, and config files apply to the merged document as a whole.
+
+```bash
+# Same theme and custom CSS applied to all merged files
+md2pdf chapter1.md chapter2.md --theme professional --css print.css -o book.pdf
 ```
 
 ## Configuration
@@ -256,7 +285,7 @@ Supported page formats:
 
 ## Requirements
 
-- Node.js >= 16.0.0
+- Node.js >= 22.12.0
 - Chromium (automatically installed with Puppeteer)
 
 ## Troubleshooting
@@ -282,11 +311,65 @@ For large documents, the conversion may take longer. Use `--verbose` to see prog
 
 MIT © Vimukthi Dissanayake
 
+## Releasing a New Version
+
+### One-liner
+
+Commits everything, bumps the version, creates the git tag, pushes both, and publishes to npm:
+
+```bash
+git add -A && git commit -m "release notes" && npm version patch -m "v%s" && git push --follow-tags && npm publish --access public
+```
+
+Swap `patch` for `minor` or `major` as appropriate, or pass an explicit version: `npm version 1.2.3`.
+
+### What each step does
+
+1. `git add -A && git commit -m "…"` — commit all changes. `npm version` refuses to run on a dirty working tree.
+2. `npm version patch -m "v%s"` — bumps `version` in `package.json`, syncs `package-lock.json`, creates a commit, and creates an annotated git tag (e.g. `v2.1.0`). `%s` is replaced with the new version.
+3. `git push --follow-tags` — pushes commits **and** the new annotated tag in a single call.
+4. `npm publish --access public` — `prepublishOnly` automatically runs `npm test && npm run lint` first, so a broken build can't ship. `--access public` is required the first time for scoped packages (and harmless every time after).
+
+If any step fails, the chain stops — fix the failure and re-run from there.
+
+### Prerequisites (one-time setup)
+
+```bash
+npm whoami            # if it errors: npm login
+```
+
+You need publish rights to the `@vimukthid` scope.
+
+### Pre-release checklist
+
+```bash
+npm test              # jest
+npm run lint          # eslint
+npm pack --dry-run    # preview the tarball contents
+npm audit             # confirm 0 vulnerabilities
+```
+
+### After publishing
+
+```bash
+npm view @vimukthid/md2pdf@latest version
+npx --yes @vimukthid/md2pdf --version
+```
+
 ## Contributing
 
 Contributions are welcome! Please read our contributing guidelines before submitting a PR.
 
 ## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md) for the full history.
+
+### 2.1.0
+- Added multi-file conversion: pass multiple Markdown files to merge them into one PDF
+- Added `--no-page-breaks` flag to disable automatic page breaks between merged files
+- **Breaking:** Removed the legacy positional-output form (`md2pdf input.md output.pdf`); use `-o`/`--output` instead
+- **Breaking:** Minimum Node.js version bumped to `>=22.12.0` (required by Puppeteer 25)
+- Updated and pinned all dependencies; resolved all known security advisories (`npm audit`: 0 vulnerabilities)
 
 ### 2.0.1
 - Added configuration file support

@@ -5,9 +5,21 @@ const path = require('path');
 const puppeteer = require('puppeteer');
 const { generateHtml, generateHeaderFooterTemplate } = require('./html-generator');
 
-async function convertMarkdownToPdf(inputPath, outputPath, config) {
-  const markdownContent = fs.readFileSync(inputPath, 'utf-8');
-  const filename = path.basename(inputPath, path.extname(inputPath));
+async function convertMarkdownToPdf(input, outputPath, config, options = {}) {
+  let markdownContent;
+  let filename;
+  let basePath;
+
+  if (options.isContent) {
+    markdownContent = input;
+    filename = path.basename(outputPath, path.extname(outputPath));
+    basePath = options.basePath || process.cwd();
+  } else {
+    const inputPath = input;
+    markdownContent = fs.readFileSync(inputPath, 'utf-8');
+    filename = path.basename(inputPath, path.extname(inputPath));
+    basePath = path.dirname(path.resolve(inputPath));
+  }
 
   const html = generateHtml(markdownContent, config, filename);
 
@@ -19,7 +31,7 @@ async function convertMarkdownToPdf(inputPath, outputPath, config) {
   try {
     const page = await browser.newPage();
 
-    const baseUrl = `file://${path.dirname(path.resolve(inputPath))}/`;
+    const baseUrl = `file://${basePath}/`;
     await page.setContent(html, {
       waitUntil: 'networkidle0',
       timeout: 30000
